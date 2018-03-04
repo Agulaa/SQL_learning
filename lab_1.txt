@@ -1,0 +1,55 @@
+/*Zad 1*/
+SELECT * FROM Products
+	WHERE UnitPrice < 10
+		AND ProductName like 'T%'
+/*Zad2*/
+SELECT OrderID,ProductID, UnitPrice*Quantity *(1-Discount) AS Price FROM [Order Details]
+	ORDER BY OrderID ASC
+/*Zad3*/
+SELECT OrderID, SUM(UnitPrice*Quantity *(1-Discount)) AS Price FROM [Order Details]
+	GROUP BY OrderID  
+
+/*Zad4*/
+SELECT OrderID, COUNT(DISTINCT ProductID) AS Uniq, 
+	SUM(UnitPrice*Quantity *(1-Discount)) AS Price 
+	FROM [Order Details] GROUP BY OrderID  
+
+/*Zad5*/
+SELECT OrderID, COUNT(DISTINCT ProductID) AS Uniq,
+	 ROUND(SUM(UnitPrice*Quantity *(1-Discount)),2) AS Price 
+	 FROM [Order Details] GROUP BY OrderID  
+
+/*Zad6*/
+SELECT SUM( UnitsInStock * UnitPrice) AS TotalPrice, SUM(UnitsInStock) AS AllProducts FROM  Products
+
+/*Zad7*/
+SELECT ProductName FROM Products
+	 WHERE UnitsInStock = 0 AND Discontinued = 0
+
+/*Zad8*/
+SELECT  CompanyName, ProductName, AVG(UnitPrice) As AvgPrice FROM Suppliers, Products
+	WHERE Suppliers.SupplierID = Products.SupplierID
+	GROUP BY CompanyName, ProductName
+	ORDER BY AVG(UnitPrice)
+
+SELECT ProductName,SupplierID,  AVG(UnitPrice) As AvgPrice FROM Products
+	GROUP BY SupplierID, ProductName
+	ORDER BY AVG(UnitPrice) ASC 
+
+/*Zad9*/
+SELECT AVG(UnitPrice) As AvgPrice, CategoryID, COUNT(*) FROM Products 
+	GROUP BY CategoryID
+	HAVING COUNT(*) <10
+
+/*Zad10*/
+SELECT ROUND(AVG(UnitPrice),2) As AvgPrice,  ROUND(MIN(UnitPrice),2) As MinPrice,  ROUND(MAX(UnitPrice),2) As MaxPrice, SupplierID,COUNT( ProductName) AS AllP FROM Products
+	GROUP BY SupplierID
+
+/*Zad11*/
+SELECT 'POL'+ CompanyName FROM Customers 
+	WHERE Country like 'Poland'
+UNION
+SELECT CompanyName, Country FROM Customers	
+	WHERE Country not like 'Poland'
+ORDER BY CompanyName ASC 
+	
