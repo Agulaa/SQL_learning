@@ -1,0 +1,98 @@
+CREATE DATABASE sklep; 
+
+USE sklep; 
+
+
+CREATE TABLE klienci( 
+klient_id INT IDENTITY(1,1) PRIMARY KEY, 
+imie VARCHAR(255) NOT NULL, 
+nazwisko  VARCHAR(255) NOT NULL, 
+email  VARCHAR(255) NOT NULL )
+
+CREATE TABLE klienci_adresy ( 
+adres_id INT IDENTITY(1,1) PRIMARY KEY, 
+klient_id INT FOREIGN KEY REFERENCES klienci(klient_id) NOT NULL, 
+ulica VARCHAR(255) NOT NULL, 
+nr_domu VARCHAR(255) NOT NULL,
+nr_mieszkania VARCHAR(255) DEFAULT '', 
+miastp VARCHAR(255) NOT NULL,
+panstwo VARCHAR(255) NOT NULL) 
+
+CREATE TABLE produkty_kategorie( 
+kategoria_id INT IDENTITY(1,1) PRIMARY KEY, 
+nazwa VARCHAR(255) NOT NULL) 
+
+CREATE TABLE produkty (
+produkt_id INT IDENTITY(1,1) PRIMARY KEY, 
+nazwa VARCHAR(255) NOT NULL,  
+cena MONEY NOT NULL, 
+kategoria_id  INT FOREIGN KEY REFERENCES produkty_kategorie(kategoria_id) NOT NULL)
+
+CREATE TABLE zamowienia (
+zamowienia_id INT IDENTITY(1,1) PRIMARY KEY, 
+klient_id INT FOREIGN KEY REFERENCES klienci(klient_id) NOT NULL, 
+data DATE NOT NULL DEFAULT GETDATE(), 
+rabat DECIMAL(5,2) NOT NULL DEFAULT 0)
+
+CREATE TABLE zamowienia_pozycje(
+pozycja_id INT IDENTITY(1,1) PRIMARY KEY, 
+zamowienie_id INT FOREIGN KEY REFERENCES zamowienia(zamowienia_id) NOT NULL, 
+produkty_id INT FOREIGN KEY REFERENCES produkty(produkt_id) NOT NULL, 
+ilosc INT NOT NULL, 
+rabat DECIMAL(5,2) NOT NULL DEFAULT 0 )
+
+INSERT INTO klienci ( imie, nazwisko, email ) 
+VALUES 
+('Aga', 'R', 'a@r.com'),
+('Mich', 'W', 'W@M.com'),
+('Szym', 'J', 's@j.com')
+
+INSERT INTO klienci_adresy (  klient_id ,  ulica , nr_domu ,nr_mieszkania , miastp, panstwo) 
+VALUES 
+(2,'sol', '12A', DEFAULT, 'poz', 'pol'),
+(3,'akl', '122A',  '9', 'waw', 'pol'),
+(1,'hsdka', '32b',  DEFAULT, 'wroc', 'pol')
+
+INSERT INTO produkty_kategorie( nazwa) 
+VALUES 
+('chleb'),
+('maslo'),
+('mleko')
+
+INSERT INTO produkty( nazwa, cena, kategoria_id) 
+VALUES 
+('przenny chleb',2.60,1),
+('maslane',6.37,2),
+('kozie', 4.2, 3)
+
+INSERT INTO zamowienia( klient_id, data, rabat) 
+VALUES 
+(1,DEFAULT, 0.6),
+(3,2018-03-21, 5),
+(2,DEFAULT, 4)
+
+INSERT INTO zamowienia_pozycje(zamowienie_id, produkty_id, ilosc, rabat)
+VALUES 
+(1,1,10,3.4),
+(2,3,24, 3),
+(3,2,7,DEFAULT)
+
+ALTER TABLE produkty_kategorie
+ADD UNIQUE(nazwa)
+
+ALTER TABLE produkty_kategorie 
+ADD CHECK(LEN(nazwa)>3)
+
+ALTER TABLE produkty_kategorie
+ADD opis TEXT 
+
+SELECT * FROM produkty_kategorie
+
+INSERT INTO produkty_kategorie( nazwa) 
+VALUES 
+('chleb')
+
+UPDATE produkty_kategorie
+SET opis = 'jest biale'
+WHERE kategoria_id = 3; 
+
