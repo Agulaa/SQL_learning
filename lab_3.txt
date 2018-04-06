@@ -1,0 +1,83 @@
+/*Zad 1*/
+CREATE VIEW [Products From USA] AS
+SELECT p.ProductName 
+FROM Products p 
+INNER JOIN Suppliers s 
+ON p.SupplierID = s.SupplierID 
+WHERE s.Country like 'USA' 
+
+SELECT * FROM [Products From USA]
+
+/*Zad 2*/
+
+SELECT * FROM Customers c
+WHERE c.CustomerID NOT IN (SELECT CustomerID FROM Orders ) 
+ 
+/*Zad 3*/
+SELECT f.FirstName, l.LastName FROM Employees f 
+CROSS JOIN Employees l 
+
+/*Zad 4*/
+SELECT c.CompanyName, p.ProductName FROM Customers c 
+JOIN Orders o ON c.CustomerID = o.CustomerID
+JOIN [Order Details] d ON o.OrderID = d.OrderID 
+JOIN Products p ON d.ProductID = p.ProductID 
+
+/*Zad 5*/
+SELECT c.CompanyName, SUM(d.UnitPrice * d.Quantity) AS "Naleznosc"
+FROM Customers c JOIN Orders o ON c.CustomerID = o.CustomerID
+JOIN [Order Details] d ON o.OrderID = d.OrderID 
+JOIN Products p ON d.ProductID = p.ProductID 
+GROUP BY c.CompanyName 
+ORDER BY "Naleznosc" DESC 
+
+
+/*Zad 6*/
+SELECT c.CompanyName FROM Customers c
+LEFT OUTER JOIN Orders o ON c.CustomerID = o.CustomerID
+WHERE o.CustomerID IS NULL
+
+/*Zad 7*/
+SELECT c.CategoryName, SUM(d.Quantity)  FROM Categories c
+JOIN Products p ON c.CategoryID = p.CategoryID 
+JOIN [Order Details] d ON p.ProductID = d.ProductID 
+JOIN Orders o ON d.OrderID = o.OrderID 
+GROUP BY c.CategoryName 
+
+SELECT p.ProductName FROM Products p 
+JOIN [Order Details] d ON p.ProductID = d.ProductID 
+JOIN Orders o ON d.OrderID = o.OrderID 
+ HAVING COUNT(o.CustomerID) > 10 
+
+/*Zad 8*/
+UPDATE Products 
+SET UnitPrice = UnitPrice * 1.1 
+WHERE ProductName in 
+(SELECT p.ProductName FROM Products p 
+JOIN [Order Details] d ON p.ProductID = d.ProductID 
+JOIN Orders o ON d.OrderID = o.OrderID
+GROUP BY p.ProductName 
+HAVING COUNT (o.OrderID) > 10 ) 
+
+
+/*Zad 9*/
+SELECT c.CompanyName, p.ProductName, e.FirstName, e.LastName
+INTO [Customer Product Employee] FROM Customers c
+JOIN Orders o ON c.CustomerID = o.CustomerID
+JOIN [Order Details] d ON o.OrderID = d.OrderID
+JOIN Employees e ON o.EmployeeID = e.EmployeeID
+JOIN Products p ON p.ProductID = d.ProductID 
+
+SELECT * FROM [Customer Product Employee]
+
+/*Zad 10*/
+INSERT INTO Customers(CompanyName) SELECT CompanyName FROM Suppliers s
+WHERE s.SupplierID NOT IN (SELECT SupplierID FROM Products);
+
+/*Zad 11*/
+CREATE VIEW [Order Prices] AS 
+SELECT o.OrderID, SUM(UnitPrice*Quantity-UnitPrice*Quantity*Discount) AS Cena
+FROM [Order Details] o 
+GROUP BY o.OrderID
+
+SELECT * FROM  [Order Prices]
