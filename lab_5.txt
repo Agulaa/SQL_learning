@@ -1,0 +1,48 @@
+/*ZADANIE 1*/
+WITH XMLNAMESPACES (DEFAULT 'http://put.poznan.pl/lab/sql/')
+SELECT * FROM Customers FOR 
+XML PATH('Customer'), ELEMENTS, ROOT('Customers')
+
+
+/*ZADANIE 2*/
+SELECT c.CustomerID, CAST(
+( SELECT * FROM Customers WHERE CustomerID=c.CustomerID 
+FOR XML PATH('Customer'), ELEMENTS) 
+AS XML ) AS Data INTO XmlCustomers
+FROM Customers c
+
+SELECT * FROM XmlCustomers
+
+/*ZADANIE 3*/
+SELECT data.value('(/Customer/CompanyName)[1]', 'varchar(max)') AS CompanyName,
+data.value('(/Customer/ContactName)[1]', 'varchar(max)') AS ContactName 
+FROM XmlCustomers
+
+
+/*ZADANIE 4*/
+SELECT data.value('(/Customer/CompanyName)[1]', 'varchar(max)')  AS CompanyName,
+data.value('(/Customer/ContactName)[1]', 'varchar(max)') AS ContactName 
+FROM XmlCustomers
+WHERE data.value('(/Customer/Country)[1]', 'varchar(max)') like 'Spain' or
+data.value('(/Customer/Country)[1]', 'varchar(max)') like 'Poland'
+FOR XML PATH ('Customer'), ROOT('Customers')
+
+/*ZADANIE 5*/
+SELECT 
+data.value('(/Customer/CustomerID)[1]', 'varchar(max)')  AS [@identyfikator], 
+data.value('(/Customer/CompanyName)[1]', 'varchar(max)')  AS Nazwa,
+data.value('(/Customer/Country)[1]', 'varchar(max)') AS Miasto
+FROM XmlCustomers
+WHERE data.value('(/Customer/Country)[1]', 'varchar(max)') like 'Germany'
+FOR XML PATH ('Klient'), ROOT('Klienci')
+
+/*ZADANIE 6*/
+
+SELECT  CAST( 
+(SELECT * FROM Orders JOIN [Order Details] AS Detail ON Orders.OrderID = Detail.OrderID  
+WHERE Detail.OrderID IN (SELECT od.OrderID FROM [Order Details] AS od 
+GROUP BY od.OrderID HAVING SUM(od.Quantity * od.UnitPrice) > 15000) 
+FOR XML AUTO, ROOT('Orders') ) AS XML) AS Data INTO XMLOrders 
+
+SELECT * FROM XMLOrders
+
